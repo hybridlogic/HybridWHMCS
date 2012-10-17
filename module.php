@@ -16,7 +16,6 @@ function hybridcluster_ConfigOptions() {
     );
 
     return $configarray;
-
 }
 
 function hybridcluster_CreateAccount($params) {
@@ -99,7 +98,6 @@ function hybridcluster_ClientArea($params) {
 function hybridcluster_LoginLink($params) {
     echo '<a href="http://'.HYBRIDCLUSTER_CONTROL_PANEL_DOMAIN.'/admin/edit-users?action=masq-user-website&amp;username='.urlencode($params['clientsdetails']['email']).'&amp;domain='.urlencode($params['domain']).'"  target="_blank" style="color:#cc0000">login to control panel</a>';
 }
-
 
 // Hooks start here
 
