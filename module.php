@@ -108,10 +108,12 @@ function hybridcluster_hook_ClientChangePassword($params) {
     return hybridcluster_getWHMCSAPI()->change_user_password($params);
 }
 
+/*
 function hybridcluster_hook_ClientDetailsValidation() {
     var_dumP($_POST); die;
     return hybridcluster_getWHMCSAPI()->validate_user_details($_POST);
 }
+*/
 
 function hybridcluster_getWHMCSAPI() {
     return new WHMCSAPI("https://" . HYBRIDCLUSTER_CONTROL_PANEL_DOMAIN,
