@@ -60,6 +60,9 @@ function hybridcluster_UnsuspendAccount($params) {
 }
 
 function hybridcluster_ChangePassword($params) {
+    if ($params['moduletype'] != "hybridcluster")
+        return;
+
     try {
         return hybridcluster_getWHMCSAPI()->change_website_password($params);
     } catch (HybridClusterAPIException $e) {
