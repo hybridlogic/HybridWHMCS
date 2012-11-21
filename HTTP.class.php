@@ -1,111 +1,88 @@
 <?php
-require("StaticSingleton.class.php");
 
-class HTTP extends StaticSingleton {
+class HTTP {
 
-	public $headers;
-	public $ch;
-	public $code;
+	static $headers;
+	static $ch;
+	static $code;
 
-    public function __construct() {
-        $this->ch = curl_init();
-    }
-
-    public function static_get($url, $parameters=Array()) {
-        if (is_array($parameters))
-            $parameters = http_build_query($parameters, "", "&");
-
-        if (strlen($parameters))
-            $url .= "?" . $parameters;
-
-        curl_setopt($this->ch, CURLOPT_URL, $url);
-		return $this->perform();
+	static function get($url, $throw=false) {
+		self::$ch = curl_init($url);
+		return self::perform(self::$ch, $throw);
 	}
 
-	public function static_post($url, $vars) {
-        curl_setopt($this->ch, CURLOPT_URL, $url);
-		curl_setopt($this->ch, CURLOPT_POST, true);
-		curl_setopt($this->ch, CURLOPT_POSTFIELDS, $vars);
-		return $this->perform();
+	static function post($url, $vars) {
+		self::$ch = curl_init($url);
+		curl_setopt(self::$ch, CURLOPT_POST, true);
+		curl_setopt(self::$ch, CURLOPT_POSTFIELDS, $vars);
+		return self::perform(self::$ch);
 	}
 
-	public function static_put($url, $file) {
-        curl_setopt($this->ch, CURLOPT_URL, $url);
+	static function put($url, $file) {
+		self::$ch = curl_init($url);
 		$fp = fopen($file, "r");
-		curl_setopt($this->ch, CURLOPT_PUT, true);
-		curl_setopt($this->ch, CURLOPT_INFILE, $fp);
-		curl_setopt($this->ch, CURLOPT_INFILESIZE, filesize($file));
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-		return curl_exec($this->ch);
+		curl_setopt(self::$ch, CURLOPT_PUT, true);
+		curl_setopt(self::$ch, CURLOPT_INFILE, $fp);
+		curl_setopt(self::$ch, CURLOPT_INFILESIZE, filesize($file));
+		curl_setopt(self::$ch, CURLOPT_RETURNTRANSFER, true);
+		return curl_exec(self::$ch);
 	}
 
-	public function static_postFile($url, $file) {
-        curl_setopt($this->ch, CURLOPT_URL, $url);
+	static function postFile($url, $file) {
+		self::$ch = curl_init($url);
 		$fp = fopen($file, "r");
-		curl_setopt($this->ch, CURLOPT_POST, true);
-		curl_setopt($this->ch, CURLOPT_INFILE, $fp);
-		curl_setopt($this->ch, CURLOPT_INFILESIZE, filesize($file));
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-		return curl_exec($this->ch);
+		curl_setopt(self::$ch, CURLOPT_POST, true);
+		curl_setopt(self::$ch, CURLOPT_INFILE, $fp);
+		curl_setopt(self::$ch, CURLOPT_INFILESIZE, filesize($file));
+		curl_setopt(self::$ch, CURLOPT_RETURNTRANSFER, true);
+		return curl_exec(self::$ch);
 	}
 
-    public function setTimeout($timeout) {
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-    }
-
-	public function static_retryGet($url) {
+	static function retryGet($url) {
 		for ($n = 0; $n < 5; $n++) {
 			try {
-				$data = $this->get($url, true);
+				$data = self::get($url, true);
 				return $data;
 			} catch (Exception $e) {};
 		}
 		throw $e;
 	}
 
-	private function perform() {
-		$this->headers = Array();
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true); // Required for TPJ importer
-        curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, Array("self", "writeHeaders"));
-		$data = curl_exec($this->ch);
-		$this->code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
-        $this->errno = curl_errno($this->ch);
-        switch (true) {
-            case ($this->errno == 28):
-                throw new HTTPTimeout;
-            case ($this->code >= 400 and $this->code < 600):
-                throw new HTTPFailed($this->code, $data);
-            // Arg this copies loads of memory, why doesn't followlocation work properly?!
-            case ($this->code == 301 or $this->code == 302 and strlen(@$this->headers['location'])):
-                curl_setopt($this->ch, CURLOPT_URL, $this->headers['location']);
-                return $this->perform();
-        }
+	static function perform($ch, $throw=false) {
+		self::$headers = Array();
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Required for TPJ importer
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, Array("self", "writeHeaders"));
+		$data = curl_exec($ch);
+		self::$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if ($throw and self::$code >= 400 and self::$code < 600)
+			throw new HTTPFailed(self::$code);
+		// Arg this copies loads of memory
+		if (self::$code == 301 or self::$code == 302 and strlen(@self::$headers['location'])) {
+			curl_setopt($ch, CURLOPT_URL, self::$headers['location']);
+			return self::perform($ch, $throw);
+		}
 		return $data;
 	}
 
-	public function static_writeHeaders($ch, $header) {
+	static function writeHeaders($ch, $header) {
 		if (strpos($header, ": ") !== false) {
 			@list($k, $v) = explode(": ", trim($header));
-			$this->headers[strtolower($k)] = $v;
+			self::$headers[strtolower($k)] = $v;
 		}
 		return strlen($header);
 	}
 }
 
-class HTTPException extends Exception {}
-class HTTPTimeout extends HTTPException {}
-class HTTPFailed extends HTTPException {
+class HTTPFailed extends Exception {
 
 	private $status_code;
 
-	public function __construct($status_code, $output=null) {
+	function __construct($status_code) {
 		$this->status_code = $status_code;
-		$this->output = $output;
 	}
 
-	public function __toString() {
-		return "HTTP Error {$this->status_code}" . (strlen($this->output) ? ', output was: ' . $this->output : '');
+	function __toString() {
+		return "HTTP Error {$this->status_code}";
 	}
 }
