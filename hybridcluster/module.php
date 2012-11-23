@@ -108,6 +108,9 @@ add_hook("ClientChangePassword", 1, "hybridcluster_hook_ClientChangePassword");
 add_hook("ClientDetailsValidation", 1, "hybridcluster_hook_ClientDetailsValidation");
 
 function hybridcluster_hook_ClientChangePassword($params) {
+    if ($params['moduletype'] != "hybridcluster")
+        return;
+
     return hybridcluster_getWHMCSAPI()->change_user_password($params);
 }
 
