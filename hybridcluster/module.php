@@ -122,19 +122,25 @@ function hybridcluster_hook_ClientDetailsValidation() {
 */
 
 function hybridcluster_getWHMCSAPI() {
-    return new WHMCSAPI("https://" . HYBRIDCLUSTER_CONTROL_PANEL_DOMAIN,
+    return new WHMCSAPI(hybridcluster__getControlPanelProtocol()."://" . HYBRIDCLUSTER_CONTROL_PANEL_DOMAIN,
         HYBRIDCLUSTER_CONTROL_PANEL_USERNAME,
         HYBRIDCLUSTER_CONTROL_PANEL_APIKEY, true);
 }
 
 function hybridcluster_getAdminAPI() {
-    return new AdminAPI("https://" . HYBRIDCLUSTER_CONTROL_PANEL_DOMAIN,
+    return new AdminAPI(hybridcluster__getControlPanelProtocol()."://" . HYBRIDCLUSTER_CONTROL_PANEL_DOMAIN,
         HYBRIDCLUSTER_CONTROL_PANEL_USERNAME,
         HYBRIDCLUSTER_CONTROL_PANEL_APIKEY, true);
 }
 
 function htmlescape($v) {
     return htmlentities($v, ENT_COMPAT, "UTF-8");
+}
+
+function hybridcluster__getControlPanelProtocol() {
+    if (defined("HYBRIDCLUSTER_CONTROL_PANEL_SSL") and !HYBRIDCLUSTER_CONTROL_PANEL_SSL)
+        return "http";
+    return "https";
 }
 
 /*
