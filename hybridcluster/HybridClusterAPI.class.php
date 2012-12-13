@@ -31,7 +31,7 @@ class HybridClusterAPI {
         $response_str = HTTP::post($url = "{$this->endpoint}/{$method}", $parameters);
 
         if (!strlen($response_str))
-            throw new HybridClusterAPIException("Empty response received");
+            throw new HybridClusterAPIException("Empty response received from {$url}");
 
         $data = json_decode($response_str);
         logModuleCall("hybridcluster", $url, $parameters, $response_str, $data, Array($this->apikey));
