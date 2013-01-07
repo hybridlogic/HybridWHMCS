@@ -261,5 +261,5 @@ function hybridcluster_debug() {
     $stack = debug_backtrace();
     $call = $stack[1];
     $function_name = $stack[1]['function'];
-    mail(HYBRIDCLUSTER_DEBUG_EMAIL, "[hc-debug] WHMCS called {$stack['function']}", print_r($stack['args'], true));
+    mail(HYBRIDCLUSTER_DEBUG_EMAIL, "[hc-debug] WHMCS called {$call['function']}", print_r($call['args'], true));
 }
