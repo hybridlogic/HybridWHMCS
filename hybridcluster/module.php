@@ -108,6 +108,7 @@ add_hook("ClientChangePassword", 1, "hybridcluster_hook_ClientChangePassword");
 add_hook("ClientDetailsValidation", 1, "hybridcluster_hook_ClientDetailsValidation");
 
 function hybridcluster_hook_ClientChangePassword($params) {
+    hybridcluster_debug();
     if ($params['moduletype'] != "hybridcluster")
         return;
 
@@ -253,3 +254,12 @@ function hybridcluster_AdminServicesTabFieldsSave($params) {
     ),array("serviceid"=>$params['serviceid']));
 }
  */
+
+function hybridcluster_debug() {
+    if (!defined("HYBRIDCLUSTER_DEBUG_EMAIL"))
+        return;
+    $stack = debug_backtrace();
+    $call = $stack[1];
+    $function_name = $stack[1]['function'];
+    mail(HYBRIDCLUSTER_DEBUG_EMAIL, "[hc-debug] WHMCS called {$stack['function']}", print_r($stack['args'], true));
+}
