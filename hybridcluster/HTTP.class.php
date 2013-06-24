@@ -15,6 +15,10 @@ class HTTP {
 		self::$ch = curl_init($url);
 		curl_setopt(self::$ch, CURLOPT_POST, true);
 		curl_setopt(self::$ch, CURLOPT_POSTFIELDS, $vars);
+        if (strpos($url,'https:')) {
+            curl_setopt(self::$ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt(self::$ch, CURLOPT_SSL_VERIFYHOST, false);
+        }
 		return self::perform(self::$ch);
 	}
 
@@ -25,6 +29,10 @@ class HTTP {
 		curl_setopt(self::$ch, CURLOPT_INFILE, $fp);
 		curl_setopt(self::$ch, CURLOPT_INFILESIZE, filesize($file));
 		curl_setopt(self::$ch, CURLOPT_RETURNTRANSFER, true);
+        if (strpos($url,'https:')) {
+            curl_setopt(self::$ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt(self::$ch, CURLOPT_SSL_VERIFYHOST, false);
+        }
 		return curl_exec(self::$ch);
 	}
 
@@ -35,6 +43,10 @@ class HTTP {
 		curl_setopt(self::$ch, CURLOPT_INFILE, $fp);
 		curl_setopt(self::$ch, CURLOPT_INFILESIZE, filesize($file));
 		curl_setopt(self::$ch, CURLOPT_RETURNTRANSFER, true);
+        if (strpos($url,'https:')) {
+            curl_setopt(self::$ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt(self::$ch, CURLOPT_SSL_VERIFYHOST, false);
+        }
 		return curl_exec(self::$ch);
 	}
 
