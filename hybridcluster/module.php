@@ -7,12 +7,12 @@ function hybridcluster_ConfigOptions() {
     # Should return an array of the module options for each product - maximum of 24
 
     $configarray = array(
-        "Units" => array( "Type" => "text", "Size" => "5", "Description" => "HCU" ),
-        "Monthly Transfer" => array( "Type" => "text", "Size" => "6", "Description" => "GB" ),
-        "FTP accounts" => array( "Type" => "text", "Size" => "3", "Description" => "accounts"),
-        "Email Accounts" => array( "Type" => "text", "Size" => "5", "Description" => "accounts"),
-        "Databases" => array( "Type" => "text", "Size" => "5", "Description" => "databases"),
-        "Disk Quota" => array( "Type" => "text", "Size" => "5", "Description" => "GB"),
+        "Units" => array( "Type" => "text", "Size" => "5", "Description" => "HCU per domain" ),
+        "Monthly Bandwidth" => array( "Type" => "text", "Size" => "6", "Description" => "GB per domain" ),
+        "Domains/Websites" => array( "Type" => "text", "Size" => "3", "Description" => "maximum"),
+        "Email Accounts" => array( "Type" => "text", "Size" => "5", "Description" => "accounts per domain"),
+        "Databases" => array( "Type" => "text", "Size" => "5", "Description" => "databases per domain"),
+        "Disk Quota" => array( "Type" => "text", "Size" => "5", "Description" => "GB per domain"),
     );
 
     return $configarray;
