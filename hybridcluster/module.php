@@ -71,16 +71,12 @@ function hybridcluster_ChangePassword($params) {
 }
 
 function hybridcluster_ChangePackage($params) {
-    return hybridcluster_getWHMCSAPI()->change_user_package($params);
-
-    # Code to perform action goes here...
-
-    if ($successful) {
-        $result = "success";
-    } else {
-        $result = "Error Message Goes Here...";
+    try {
+        return hybridcluster_getWHMCSAPI()->change_user_package($params);
     }
-    return $result;
+    catch (HybridClusterAPIException $e) {
+        return $e->getMessage();
+    }
 
 }
 
