@@ -34,14 +34,15 @@ class HybridClusterAPI {
             throw new HybridClusterAPIException("Empty response received from {$url}");
 
         $data = json_decode($response_str);
-        logModuleCall("hybridcluster", $url, $parameters, $response_str, $data, Array($this->apikey));
-        
+
         if (is_null($data))
             throw new HybridClusterAPIJSONDecodeException($response_str);
         if (@$data->result == "string")
             return $data->string;
         if (@$data->result != "success")
             throw new HybridClusterAPIError($data->error);
+
+        logModuleCall("hybridcluster", $url, $parameters, $response_str, $data, Array($this->apikey));
 
         unset($data->result);
 
